@@ -1,14 +1,16 @@
 # SolarLight
 Use ColoLight to visualize the power generation of SMA inverter 
 
+Cololight: https://cololight.de/
 
 
 To get started:
 
 1) Clone git repo
 2) Edit Solarlight.py and replace IP address for SMA inverter and Cololight
-3) The SMA register numbers are for STP10k inverters, other models might need different register numbers (in Wechselrichter.py)
-4) Run Solarlight.py and enjoy the colors
+3) Ensure modbus tcp is enabled on your SMA inverter
+4) The SMA register numbers are for STP10k inverters, other models might need different register numbers (in Wechselrichter.py)
+5) Run Solarlight.py and enjoy the colors
 
 
 
