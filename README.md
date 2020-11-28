@@ -29,4 +29,5 @@ To get started:
         
         
         
+Thanks to BazaJayGee66 for the Cololight python class ( Github BazaJayGee66 / homeassistant_cololight)
         
