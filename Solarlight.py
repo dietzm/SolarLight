@@ -23,11 +23,11 @@ class Solarlight:
         self.wr1.getValue("Netzbezug")
         self.wr1.getValue("Einspeisung")
     
-
         #Establish cololight connection
         self.col = PyCololight("192.168.0.167")
         self.col.brightness=100  
-    
+        
+        self.errorcnt = 0
     
     
     def setColorSimple(self, einspeisung):
@@ -109,10 +109,10 @@ class Solarlight:
         self.col.add_custom_effect("Current","Mood",color,speed,mode)
         newhex = self.col._effects.get("Current",0)
         if oldhex == newhex:
-            print("Same color & speed, skip ")
+            print("Same color & speed, skip cololight cmd")
             return
 
-        print(f"Set ColoLight {color}:{speed}")
+        print(f"Set ColoLight {color} S:{speed} M:{mode}")
         self.col.effect = "Current"
         
     
@@ -120,16 +120,28 @@ class Solarlight:
         #en=-500
         netzbezug=0
         while True:
-            einspeisung = self.wr1.getValue("Einspeisung")
-            if einspeisung <= 1:
-                netzbezug = self.wr1.getValue("Netzbezug")
-        #    einspeisung = en
-        #   netzbezug=en*-1
-        #    en=en+200
-            print(f"Calculate Color Mode for Einsp:{einspeisung} Netz:{netzbezug}")
-            self.setColorMood(einspeisung, netzbezug)
-            time.sleep(10)
-   
+            try:
+                einspeisung = self.wr1.getValue("Einspeisung")
+                if einspeisung <= 1:
+                    netzbezug = self.wr1.getValue("Netzbezug")
+            #    einspeisung = en
+            #   netzbezug=en*-1
+            #    en=en+200
+                print(f"Calculate Color Mode for Einsp:{einspeisung} Netz:{netzbezug}")
+                self.setColorMood(einspeisung, netzbezug)
+                self.errorcnt = 0 # reset error count
+                time.sleep(5)
+            except Exception as e:
+                self.handleerror(e)
+    
+    
+    def handleerror(self, e):
+        #Set color to white and flash
+        self.errorcnt = self.errorcnt +1
+        print(f"Exception: {e} {self.errorcnt}")
+        self.col.add_custom_effect("Current","Flash","White",29,17)
+        time.sleep(self.errorcnt*60)
+        
 
 if __name__ == "__main__":
     sl = Solarlight()
