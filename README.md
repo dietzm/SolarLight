@@ -3,7 +3,7 @@ Use ColoLight to visualize the power generation of SMA inverter
 
 Cololight: https://cololight.de/
 
-
+<img src="SolarLight.jpg" width=300px/>
 **To get started:**
 
 1) Clone git repo
