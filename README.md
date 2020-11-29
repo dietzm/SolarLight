@@ -33,6 +33,7 @@ Cololight: https://cololight.de/
  - \>1000W    Red
      
  **Mood mode speed**
+ 
  Cololight mood mode speed is set depending on the Feed-in/supply W value within the range. 
  Lower values will use lower speed (26) and higher values will go up to speed 32.
  e.g.  Feed-in 1620W  -> Color Grass, Speed 27
