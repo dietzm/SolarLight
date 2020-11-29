@@ -14,6 +14,7 @@ Cololight: https://cololight.de/
 6) Enjoy the PV Status LEDs 
 
 
+## LED Colors & Modes
 
 **Grid feed-in (W) colors (Mood, mode 6):**
      
@@ -30,7 +31,13 @@ Cololight: https://cololight.de/
  - 0-200W     Azure
  - 200-1000W  Pink
  - \>1000W    Red
-               
+     
+ **Mood mode speed**
+ Cololight mood mode speed is set depending on the Feed-in/supply W value within the range. 
+ Lower values will use lower speed (26) and higher values will go up to speed 32.
+ e.g.  Feed-in 1620W  -> Color Grass, Speed 27
+       Feed-in 2420W  -> Color Grass, Speed 32e.g.  
+       Feed-in 499W  -> Color Azure, Speed 32
         
 Thanks to BazaJayGee66 for the Cololight python class ( Github BazaJayGee66 / homeassistant_cololight)
         
