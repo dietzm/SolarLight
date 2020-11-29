@@ -1,7 +1,8 @@
 from pymodbus.client.sync import ModbusTcpClient as ModbusClient
 from pymodbus.constants import Endian
 from pymodbus.payload import BinaryPayloadDecoder 
-
+import logging
+log = logging.getLogger()
 # STP 10k
 #
 # 30865 Netzbezug in W   s32
@@ -30,22 +31,22 @@ class Wechselrichter:
     def connect(self):
         c=self.client.connect()
         if c:
-            print(f"Connect to {self.server} successfull")
+            log.info(f"Connect to {self.server} successfull")
         else:
-            print(f"Connect to {self.server} failed")
+            log.warning(f"Connect to {self.server} failed")
             
     
     def getValue(self,typ):
         nr = self.wr.get(typ, None);
         if nr is None:
-            print(f"Cannot get register number for typ {typ}")
+            log.error(f"Cannot get register number for typ {typ}")
             return 0
         
         result = self.client.read_input_registers(nr, 2, unit=3)
-        print(f"DEBUG: {result.registers}")
+        log.debug(f"DEBUG: {result.registers}")
         decoder = BinaryPayloadDecoder.fromRegisters(result.registers, wordorder=Endian.Big, byteorder=Endian.Big)
         value = decoder.decode_32bit_uint()
-        print(f"{typ} ({nr}): {value} W?")
+        log.debug(f"{typ} ({nr}): {value} W?")
         return value
 
 

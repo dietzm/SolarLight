@@ -7,7 +7,7 @@ from Wechselrichter import Wechselrichter
 from light.Cololight import PyCololight
 import time
 import logging
-
+import sys
 
 logging.basicConfig()
 log = logging.getLogger()
@@ -16,17 +16,25 @@ log.setLevel(logging.INFO)
 
 class Solarlight:
     
-    def __init__(self):
-        #print(sys.argv[1])
-        self.wr1=Wechselrichter("192.168.0.156")
-        #test
-        self.wr1.getValue("Netzbezug")
-        self.wr1.getValue("Einspeisung")
+    def __init__(self, wr_ip, cl_ip):
+        log.info(f"Starting Solarlight. Get data from {wr_ip} and set LED on {cl_ip}")
+        log.info("-------------------------------")
+        try:
+            self.wr1=Wechselrichter(wr_ip)
+            self.wr1.getValue("Netzbezug")
+            self.wr1.getValue("Einspeisung")
+        except:
+            log.error("ERROR: Can not get data from inverter. Please check inverter IP, modbus enabled and register numbers match")
+            exit(1)
     
-        #Establish cololight connection
-        self.col = PyCololight("192.168.0.167")
-        self.col.brightness=100  
-        
+        try:
+            #Establish cololight connection
+            self.col = PyCololight(cl_ip)
+            self.col.brightness=100
+        except:
+            #TODO UDP send will never fail, add ICMP check
+            log.error("ERROR: Can not connect to cololight. Please check IP")
+            exit(1)
         self.errorcnt = 0
     
     
@@ -109,10 +117,10 @@ class Solarlight:
         self.col.add_custom_effect("Current","Mood",color,speed,mode)
         newhex = self.col._effects.get("Current",0)
         if oldhex == newhex:
-            print("Same color & speed, skip cololight cmd")
+            log.debug("Same color & speed, skip cololight cmd")
             return
 
-        print(f"Set ColoLight {color} S:{speed} M:{mode}")
+        log.info(f"Set ColoLight {color} S:{speed} M:{mode}")
         self.col.effect = "Current"
         
     
@@ -127,7 +135,7 @@ class Solarlight:
             #    einspeisung = en
             #   netzbezug=en*-1
             #    en=en+200
-                print(f"Calculate Color Mode for Einsp:{einspeisung} Netz:{netzbezug}")
+                log.info(f"Calculate Color Mode for Einsp:{einspeisung} Netz:{netzbezug}")
                 self.setColorMood(einspeisung, netzbezug)
                 self.errorcnt = 0 # reset error count
                 time.sleep(5)
@@ -138,14 +146,18 @@ class Solarlight:
     def handleerror(self, e):
         #Set color to white and flash
         self.errorcnt = self.errorcnt +1
-        print(f"Exception: {e} {self.errorcnt}")
+        log.error(f"Exception: {e} {self.errorcnt}")
         self.col.add_custom_effect("Current","Flash","White",29,17)
         time.sleep(self.errorcnt*60)
         
 
 if __name__ == "__main__":
-    sl = Solarlight()
+    if len(sys.argv) < 3:
+        print("Usage: Solarlight.py <inverter ip> <cololight ip>")
+        exit(0)
+
+    sl = Solarlight(sys.argv[1], sys.argv[2])
     sl.runLoop()
     
-    
+
     
