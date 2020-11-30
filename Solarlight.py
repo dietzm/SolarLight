@@ -31,6 +31,7 @@ class Solarlight:
             #Establish cololight connection
             self.col = PyCololight(cl_ip)
             self.col.brightness=100
+            self.col.add_custom_effect("Error","Flash","White",29,17)
         except:
             #TODO UDP send will never fail, add ICMP check
             log.error("ERROR: Can not connect to cololight. Please check IP")
@@ -129,6 +130,11 @@ class Solarlight:
         netzbezug=0
         while True:
             try:
+                if self.errorcnt > 1:
+                    #try reconnect
+                    log.warning("Try reconnect because of error")
+                    self.wr1.connect()
+
                 einspeisung = self.wr1.getValue("Einspeisung")
                 if einspeisung <= 1:
                     netzbezug = self.wr1.getValue("Netzbezug")
@@ -146,9 +152,10 @@ class Solarlight:
     def handleerror(self, e):
         #Set color to white and flash
         self.errorcnt = self.errorcnt +1
-        log.error(f"Exception: {e} {self.errorcnt}")
-        self.col.add_custom_effect("Current","Flash","White",29,17)
-        time.sleep(self.errorcnt*60)
+        log.exception(e)
+        log.error(f"Exception: {e} count:{self.errorcnt}")
+        self.col.effect = "Error"
+        time.sleep(self.errorcnt*30)
         
 
 if __name__ == "__main__":

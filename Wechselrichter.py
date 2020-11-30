@@ -2,6 +2,7 @@ from pymodbus.client.sync import ModbusTcpClient as ModbusClient
 from pymodbus.constants import Endian
 from pymodbus.payload import BinaryPayloadDecoder 
 import logging
+import sys
 log = logging.getLogger()
 # STP 10k
 #
@@ -18,7 +19,7 @@ class Wechselrichter:
     "Erzeugung": 30869,
     "Eigenverbrauch": 30871,
     "Tagesertrag":30535,
-    "totaloutwh": 30775
+    "PVTotalW": 30775
     }
 
     def __init__(self, server, port=502, wr=stp10k):
@@ -50,5 +51,15 @@ class Wechselrichter:
         return value
 
 
-    
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Usage: Wechselrichter.py ip register")
+        exit(0)
+
+    mw = Wechselrichter(sys.argv[1])
+    key = f"Register:{sys.argv[2]}"
+    mw.stp10k[key] = int(sys.argv[2])
+    val = mw.getValue(key)
+    print(f"{key}: {val}")
     
